@@ -1,0 +1,26 @@
+﻿<local:CtrlWinBase
+    xmlns:extension="clr-namespace:FzLib.Control.Extension;assembly=FzWpfControlLib"
+    x:Class="CRMC.Client.UI.WinScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CRMC.Client.UI"
+       xmlns:win10="clr-namespace:FzLib.Control.Win10Style;assembly=FzWpfControlLib"      
+      xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Loaded="Window_Loaded"
+    Closing="WindowClosing"
+        Title="屏幕监控">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Image x:Name="img"/>
+
+
+    </Grid>
+</local:CtrlWinBase>

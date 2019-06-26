@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMC.Server", "CRMC.Server\CRMC.Server.csproj", "{13FB2C02-63CB-4F81-828C-5A92553E6338}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMC.Common", "CRMC.Common\CRMC.Common.csproj", "{26D47129-2336-4013-8E28-4FEECFA8BE5E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案文件", "解决方案文件", "{3BFF07D4-CDE1-4EBC-B4BF-0D7ED7B70C50}"
+	ProjectSection(SolutionItems) = preProject
+		技术手册.md = 技术手册.md
+		日志.md = 日志.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMC.Client", "CRMC.Client\CRMC.Client.csproj", "{BC01F3CE-1119-4BDE-B392-9C73AAF4AC16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13FB2C02-63CB-4F81-828C-5A92553E6338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13FB2C02-63CB-4F81-828C-5A92553E6338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13FB2C02-63CB-4F81-828C-5A92553E6338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13FB2C02-63CB-4F81-828C-5A92553E6338}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26D47129-2336-4013-8E28-4FEECFA8BE5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26D47129-2336-4013-8E28-4FEECFA8BE5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26D47129-2336-4013-8E28-4FEECFA8BE5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26D47129-2336-4013-8E28-4FEECFA8BE5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC01F3CE-1119-4BDE-B392-9C73AAF4AC16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC01F3CE-1119-4BDE-B392-9C73AAF4AC16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC01F3CE-1119-4BDE-B392-9C73AAF4AC16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC01F3CE-1119-4BDE-B392-9C73AAF4AC16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5FB845F-3EDC-4C18-86DE-1DBBA8C74BA3}
+	EndGlobalSection
+EndGlobal

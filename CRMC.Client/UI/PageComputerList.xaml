@@ -1,0 +1,39 @@
+﻿<Page x:Class="CRMC.Client.UI.PageComputerList"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CRMC.Client.UI"
+       xmlns:win10="clr-namespace:FzLib.Control.Win10Style;assembly=FzWpfControlLib"
+       
+      xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
+        mc:Ignorable="d"
+        x:Name="win" 
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Loaded="Window_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" local:MarginSetter.Margin="6">
+            <flat:Button Click="ScreenControlButtonClick">屏幕监控</flat:Button>
+            <flat:Button Click="Button_Click">系统硬件信息</flat:Button>
+        </StackPanel>
+        <flat:ListView x:Name="lvw" Grid.Row="2
+                       " ItemsSource="{Binding Clients}">
+            <flat:ListView.View>
+                <GridView>
+                    <GridViewColumn  Header="名称" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn  Header="IP" DisplayMemberBinding="{Binding IP}"/>
+                    <GridViewColumn  Header="端口" DisplayMemberBinding="{Binding Port}"/>
+                </GridView>
+            </flat:ListView.View>
+        </flat:ListView>
+
+
+    </Grid>
+</Page>

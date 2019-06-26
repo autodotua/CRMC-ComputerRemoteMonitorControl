@@ -1,0 +1,25 @@
+﻿<Window x:Class="CRMC.Client.WinMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
+        xmlns:local="clr-namespace:CRMC.Client"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        WindowStartupLocation="CenterScreen"
+        Title="计算机远程监控系统——客户端" 
+        Closing="Window_Closing"
+                  Height="450" Width="800">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <flat:Button x:Name="btnChangePassword" Visibility="Hidden" HorizontalAlignment="Right" Margin="0,0,48,0" Content="修改密码" Click="ChangePasswordButtonClick"/>
+        <flat:Button x:Name="btnLogout" Visibility="Hidden" HorizontalAlignment="Right" Content="注销" Click="LogoutButtonClick"/>
+        <Frame Grid.Row="2" NavigationUIVisibility="Hidden" x:Name="frame" Source="PageLogin.xaml"/>
+
+    </Grid>
+</Window>

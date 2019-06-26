@@ -1,0 +1,53 @@
+﻿<Window x:Class="CRMC.Server.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CRMC.Server"
+      xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
+        mc:Ignorable="d"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded"
+        WindowStartupLocation="CenterScreen"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="计算机远程监控系统——服务端" Height="450" Width="800">
+    <Grid Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="16"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="grdControl" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="144"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" >数据库连接字符串：</TextBlock>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2">本机IP：</TextBlock>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="4">网络端口：</TextBlock>
+            <flat:TextBox Grid.Column="2" Text="{Binding Config.DbConnectionString}"/>
+            <flat:TextBox Grid.Column="2" Grid.Row="2" Text="{Binding Config.DeviceIP}"/>
+            <flat:TextBox Grid.Column="2" Grid.Row="4" Text="{Binding Config.Port}"/>
+            <flat:Button x:Name="btnStart" Grid.Row="6" Grid.ColumnSpan="3" Content="启动" Click="Button_Click"/>
+        </Grid>
+        <flat:ListView x:Name="lvwLog" ItemsSource="{Binding Logs}" Grid.Column="2">
+            <flat:ListView.View>
+                <GridView>
+                    <GridViewColumn Header="时间" DisplayMemberBinding="{Binding Time}"/>
+                    <GridViewColumn Header="客户端IP" Width="96"  DisplayMemberBinding="{Binding IP}"/>
+                    <GridViewColumn Header="内容" Width="512" DisplayMemberBinding="{Binding Content}"/>
+                </GridView>
+            </flat:ListView.View>
+        </flat:ListView>
+    </Grid>
+</Window>
