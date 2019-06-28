@@ -30,11 +30,11 @@ namespace CRMC.Client
                  var command = (ApiCommand)e.Content.Command;
                  Debug.WriteLine("客户端接收到：" + command);
 
-                 
+
                  switch (command)
                  {
-                    //以下为通用
-                    case S_ClientsUpdate:
+                     //以下为通用
+                     case S_ClientsUpdate:
                          ClientInfo[] clients = e.Content.Data as ClientInfo[];
                          ClientsUpdate?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
@@ -46,8 +46,8 @@ namespace CRMC.Client
                          NoSuchClient?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
 
-                    //以下为控制端
-                    case Screen_NewScreen:
+                     //以下为控制端
+                     case Screen_NewScreen:
                          ReceivedNewImage?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
 
@@ -61,25 +61,54 @@ namespace CRMC.Client
                          WMIPropsReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
 
-                    //以下为被控端
-                    case Screen_AskForStartScreen:
+                     case File_RootDirectory:
+                         FileSystemRootReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+                         break;
+                     case File_DirectoryContent:
+                         FileSystemDirectoryContentReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+                         break;
+                     case File_Download:
+                         FileSystemDownloadPartReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+                         break;
+                     case File_ReadDownloadFileError:
+                         FileSystemDownloadErrorReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+                         break;
+
+                     //以下为被控端
+                     case Screen_AskForStartScreen:
                          await ScreenHelper.StartSendScreen();
                          break;
                      case Screen_AskForStopScreen:
-                          ScreenHelper.StopSendScreen();
+                         ScreenHelper.StopSendScreen();
                          break;
                      case Screen_AskForNextScreen:
                          SendNextScreen?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
                      case WMI_AskForNamespaces:
-                             WMIHelper.SendNamespaces(e.Content.AId);
+                         WMIHelper.SendNamespaces(e.Content);
                          break;
                      case WMI_AskForClasses:
-                             WMIHelper.SendWMIClasses(e.Content.Data as string,e.Content.AId);
+                         WMIHelper.SendWMIClasses(e.Content.Data as string, e.Content);
                          break;
                      case WMI_AskForProps:
-                         WMIHelper.SendProperties(e.Content.Data as WMIClassInfo,e.Content.AId);
+                         WMIHelper.SendProperties(e.Content.Data as WMIClassInfo, e.Content);
                          break;
+                     case File_AskForRootDirectory:
+                         FileSystemHelper.SendDiskDrives(e.Content);
+                         break;
+                     case File_AskForDirectoryContent:
+                         FileSystemHelper.SendDirectoryContent(e.Content);
+                         break;
+                     case File_AskForDownloading:
+                         FileSystemHelper.StartDownloadingToA(e.Content);
+                         break;
+                     case File_CanSendDownloadPartAgain:
+                         FileSystemHelper.CanSendNextPart.Add((Guid)e.Content.Data);
+                         break;
+                     case File_AskForCancelDownload:
+                         FileSystemHelper.Cancle.Add((Guid)e.Content.Data);
+                         break;
+
 
                  }
              };
@@ -93,6 +122,10 @@ namespace CRMC.Client
         public event EventHandler<DataReceivedEventArgs> WMINamespacesReceived;
         public event EventHandler<DataReceivedEventArgs> WMIClassesReceived;
         public event EventHandler<DataReceivedEventArgs> WMIPropsReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemRootReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemDirectoryContentReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemDownloadPartReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemDownloadErrorReceived;
 
         public static Telnet Instance { get; } = new Telnet();
         public bool CanSendNextScreen { get; private set; } = true;
@@ -108,7 +141,7 @@ namespace CRMC.Client
         public static byte[] SocketEnd = { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, };        /// <summary>
         //private static Thread thread;
         public static IPAddress IP { get; private set; }
-      
+
         public Socket ClientSocket { get; protected set; }
         protected TelnetBase(string ip, int port, bool receive)
         {
@@ -185,7 +218,7 @@ namespace CRMC.Client
                     stream.Flush();
                     received = stream.ToArray();
                 }
-            _a:
+                _a:
                 byte command = received[0];
                 byte[] data = new byte[totalLength - 1 - SocketEnd.Length];
                 if (data.Length > 0)

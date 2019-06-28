@@ -81,7 +81,7 @@ namespace CRMC.Client.Controlled
                         //bytes = screen.CaptureScreenBytes();
                         await Task.Delay(16);
                     } while (bytes == null);
-                    Telnet.Instance.Send(new Common.Model.CommandContent(ApiCommand.Screen_NewScreen, default, Global.CurrentClient.Id, bytes));
+                    Telnet.Instance.Send(new Common.Model.CommandBody(ApiCommand.Screen_NewScreen, default, Global.CurrentClient.Id, bytes));
                     //Debug.WriteLine("发送");
                     //ok = true;
                     lastSendTime = DateTime.Now;

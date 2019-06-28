@@ -57,5 +57,25 @@ namespace CRMC.Client.UI
             LoadingOverlay loading = grd.Children.OfType<LoadingOverlay>().SingleOrDefault();
             loading?.Hide();
         }
+
+        protected void RefreshGridViewColumns(ListView lvw)
+        {
+            if (lvw.View is GridView gv)
+            {
+                foreach (var c in gv.Columns)
+                {
+                    // Code below was found in GridViewColumnHeader.OnGripperDoubleClicked() event handler (using Reflector)
+                    // i.e. it is the same code that is executed when the gripper is double clicked
+                    if (double.IsNaN(c.Width))
+                    {
+                        c.Width = c.ActualWidth;
+                    }
+                    c.Width = double.NaN;
+                }
+
+                StopLoading();
+            }
+
+        }
     }
 }

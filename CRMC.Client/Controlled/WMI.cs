@@ -15,11 +15,11 @@ namespace CRMC.Client.Controlled
     {
         public static List<string> namespaces = new List<string>();
         private static bool startGettingNamespaces = false;
-        public static void SendNamespaces(Guid aId)
+        public static void SendNamespaces(CommandBody cmd)
         {
             if (startGettingNamespaces)
             {
-                Telnet.Instance.Send( new CommandContent(Common.ApiCommand.WMI_Namespace,aId, Global.CurrentClient.Id, namespaces));
+                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.Id, namespaces));
                 return;
             }
             startGettingNamespaces = true;
@@ -47,7 +47,7 @@ namespace CRMC.Client.Controlled
                             string namespaceName = root + "\\" + ns["Name"].ToString();
                             // items.Add(namespaceName);
                             namespaces.Add(namespaceName);
-                            Telnet.Instance.Send( new CommandContent(Common.ApiCommand.WMI_Namespace,aId, Global.CurrentClient.Id, new string[] { namespaceName }));
+                            Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.Id, new string[] { namespaceName }));
 
                             await GetNamespaces(namespaceName);
 
@@ -61,14 +61,14 @@ namespace CRMC.Client.Controlled
             }
 
         }
-        public static void SendWMIClasses(string @namespace,Guid aId)
+        public static void SendWMIClasses(string @namespace, CommandBody cmd)
         {
             Task.Run(() =>
             {
                 var items = GetWMIClasses(@namespace).classes;
                 var classes = from x in items select new WMIClassInfo() { Namespace = @namespace, Class = x };
 
-                Telnet.Instance.Send( new CommandContent(Common.ApiCommand.WMI_Classes,aId, Global.CurrentClient.Id,classes.ToArray()));
+                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Classes,cmd.AId, Global.CurrentClient.Id,classes.ToArray()));
             });
         }
 
@@ -110,11 +110,11 @@ namespace CRMC.Client.Controlled
             return (classList.ToArray(), classMethodList.ToArray(), classEventList.ToArray());
         }
 
-        public static void SendProperties(WMIClassInfo wmi,Guid aId)
+        public static void SendProperties(WMIClassInfo wmi, CommandBody cmd)
         {
             Task.Run(() =>
             {
-                Telnet.Instance.Send(new CommandContent(Common.ApiCommand.WMI_Props, aId, Global.CurrentClient.Id, GetProperties(wmi)));
+                Telnet.Instance.Send(new CommandBody(Common.ApiCommand.WMI_Props, cmd.AId, Global.CurrentClient.Id, GetProperties(wmi)));
             });
         }
 
@@ -144,23 +144,79 @@ namespace CRMC.Client.Controlled
                     foreach (PropertyData prop in obj.Properties)
                     {
                         string value = null;
-                        if(prop.Name=="MUILanguages")
+                        if(prop.Name=="Capabilities")
                         {
 
                         }
-                        if(prop.Value is string[])
+                        if (prop.Value != null)
                         {
-                            value = string.Join(" | ", prop.Value as string[]);
-                        }
-                        else
-                        {
-                            value = prop?.Value?.ToString();
+                            if (prop.IsArray)
+                            {
+                                switch (prop.Type)
+                                {
+                                    case CimType.None:
+                                        value = null;
+                                        break;
+                                    case CimType.SInt8:
+                                        value = string.Join(" | ", prop.Value as sbyte[]);
+                                        break;
+                                    case CimType.UInt8:
+                                        value = string.Join(" | ", prop.Value as byte[]);
+                                        break;
+                                    case CimType.SInt16:
+                                        value = string.Join(" | ", prop.Value as short[]);
+                                        break;
+                                    case CimType.UInt16:
+                                        value = string.Join(" | ", prop.Value as ushort[]);
+                                        break;
+                                    case CimType.SInt32:
+                                        value = string.Join(" | ", prop.Value as int[]);
+                                        break;
+                                    case CimType.UInt32:
+                                        value = string.Join(" | ", prop.Value as uint[]);
+                                        break;
+                                    case CimType.SInt64:
+                                        value = string.Join(" | ", prop.Value as long[]);
+                                        break;
+                                    case CimType.UInt64:
+                                        value = string.Join(" | ", prop.Value as ulong[]);
+                                        break;
+                                    case CimType.Real32:
+                                        value = string.Join(" | ", prop.Value as float[]);
+                                        break;
+                                    case CimType.Real64:
+                                        value = string.Join(" | ", prop.Value as double[]);
+                                        break;
+                                    case CimType.Boolean:
+                                        value = string.Join(" | ", prop.Value as bool[]);
+                                        break;
+                                    case CimType.String:
+                                        value = string.Join(" | ", prop.Value as string[]);
+                                        break;
+                                    case CimType.DateTime:
+                                        value = string.Join(" | ", prop.Value as DateTime[]);
+                                        break;
+                                    case CimType.Reference:
+                                        value = string.Join(" | ", prop.Value as short[]);
+                                        break;
+                                    case CimType.Char16:
+                                        value = string.Join(" | ", prop.Value as char[]);
+                                        break;
+                                    case CimType.Object:
+                                        value = string.Join(" | ", prop.Value as object[]);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                value = prop?.Value?.ToString();
+                            }
                         }
                         props.Add(new WMIPropertyInfo() { Name = prop.Name, Value =value});
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 collection.Add(new WMIPropertyCollection() { Name = "发生异常：" + ex.Message });
             }

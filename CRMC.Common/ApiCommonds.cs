@@ -31,13 +31,30 @@
         WMI_Classes,
 
         WMI_AskForProps,
-        WMI_Props
+        WMI_Props,
+
+        #endregion
+
+        #region 文件系统
+
+        File_AskForRootDirectory,
+        File_RootDirectory,
+        File_AskForDirectoryContent,
+        File_DirectoryContent,
+
+        File_AskForDownloading,
+        File_Download,
+        File_CanSendDownloadPartAgain,
+        File_ReadDownloadFileError,
+        File_AskForCancelDownload,
+
 
         #endregion
 
     }
 
-    public enum ControlType {
+    public enum ControlType
+    {
         Screen,
         WMI
     }

@@ -32,36 +32,7 @@ namespace CRMC.Common
         /// </summary>
         public static Task StartListening(string ip, int port)
         {
-            IP = IPAddress.Parse(ip);
-            ListenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            ListenerSocket.Bind(new IPEndPoint(IP, port));
-            ListenerSocket.Listen(100);//设定最多100个排队连接请求   
-            return Task.Run(() =>
-            {
-                {
-                    while (true)
-                    {
-                        Socket clientSocket = null;
-                        try
-                        {
-                            clientSocket = ListenerSocket.Accept();
-                            Telnet t = new Telnet();
-                            t.ClientSocket = clientSocket;
-                            Thread receiveThread = new Thread(t.Receive);
-                            receiveThread.Start();
-                            ClientLinked?.Invoke(t, new ClientLinkedEventArgs(t));
-                        }
-                        catch
-                        {
-
-                        }
-                        if (closing)
-                        {
-                            return;
-                        }
-                    }
-                }
-            });
+            return StartListening(ip, port,()=>new Telnet());
         }
         public static Task StartListening<T>(string ip, int port, Func<T> getNew) where T : Telnet
         {
@@ -135,7 +106,7 @@ namespace CRMC.Common
                 int length = 0;
                 int totalLength = 0;
                 byte[] received = null;
-                CommandContent content = null;
+                CommandBody content = null;
                 using (MemoryStream stream = new MemoryStream())
                 {
                     try
@@ -189,6 +160,8 @@ namespace CRMC.Common
                     stream.Seek(0, SeekOrigin.Begin);
                     content = Deserialize(stream);
                 }
+                tttt += totalLength;
+                Debug.WriteLine("收到的长度：" + tttt);
                 //byte command = received[0];
                 //byte[] data = new byte[totalLength - 1 - SocketEnd.Length];
                 //if (data.Length > 0)
@@ -198,6 +171,8 @@ namespace CRMC.Common
                 DataReceived?.Invoke(this, new DataReceivedEventArgs(content));
             }
         }
+
+        long tttt = 0;
 
         //public void Send(ApiCommand command)
         //{
@@ -221,7 +196,7 @@ namespace CRMC.Common
         //}
 
 
-        public void Send(CommandContent content)
+        public void Send(CommandBody content)
         {
             Send(Serialize(content));
 
@@ -242,8 +217,8 @@ namespace CRMC.Common
 
             Array.Copy(SocketEnd, 0, buffer,  data.Length, SocketEnd.Length);
             //buffer[0] = command;
-
-            ClientSocket.Send(buffer);
+       
+                ClientSocket.Send(buffer);
             //Debug.Assert(data != null);
             //ClientSocket.Send(new byte[]{    command});
             ////byte[] buffer = new byte[data.Length + 1 ];
@@ -258,7 +233,7 @@ namespace CRMC.Common
 
         }
 
-        private byte[] Serialize(CommandContent obj)
+        private byte[] Serialize(CommandBody obj)
         {
 
             using (MemoryStream ms = new MemoryStream())
@@ -273,21 +248,21 @@ namespace CRMC.Common
                 {
                     throw;
                 }
-
+    
                 return ms.ToArray();
             }
         }
 
 
-        static CommandContent Deserialize(MemoryStream ms)
+        static CommandBody Deserialize(MemoryStream ms)
         {
-            CommandContent content = null;
+            CommandBody content = null;
 
             try
             {
                 BinaryFormatter formatter = new BinaryFormatter();
 
-                content = (CommandContent)formatter.Deserialize(ms);
+                content = (CommandBody)formatter.Deserialize(ms);
             }
             catch (Exception e)
             {
@@ -325,14 +300,14 @@ namespace CRMC.Common
         public event EventHandler<DataReceivedEventArgs> DataReceived;
         public class DataReceivedEventArgs : EventArgs
         {
-            public DataReceivedEventArgs(CommandContent datas)
+            public DataReceivedEventArgs(CommandBody datas)
             {
                 //Command = command;
                 Content = datas;
             }
 
             //public byte Command { get; private set; }
-            public CommandContent Content { get; private set; }
+            public CommandBody Content { get; private set; }
 
 
 

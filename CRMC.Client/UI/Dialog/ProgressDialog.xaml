@@ -1,0 +1,26 @@
+﻿<dialog:DialogWindowBase
+    xmlns:dialog="clr-namespace:FzLib.Control.Dialog;assembly=FzWpfControlLib"
+    x:Class="CRMC.Client.UI.Dialog.ProgressDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CRMC.Client.UI.Dialog"
+    xmlns:flatstyle="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
+    mc:Ignorable="d"
+    Closing="DialogWindowBase_Closing"  
+        Title="ProgressDialog" Height="450" Width="800">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/> 
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Message}"/>
+        <ProgressBar x:Name="prgb" Height="24" Grid.Row="2" Value="{Binding Value}" Maximum="{Binding Maximum}" 
+                     Minimum="{Binding Minimum}" MinWidth="320"/>
+        <flatstyle:Button HorizontalAlignment="Right" Grid.Row="4" Content="{Binding ButtonLabel}" Click="Button_Click"/>
+    </Grid>
+</dialog:DialogWindowBase>

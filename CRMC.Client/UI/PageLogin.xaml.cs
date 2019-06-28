@@ -116,7 +116,7 @@ namespace CRMC.Client.UI
             Config.Instance.UserPassword = pswd.Password.Length == 32 ? pswd.Password : md5.GetString("MD5", pswd.Password);
 
             Telnet.Instance.LoginFeedback += LoginFeedback;
-            Telnet.Instance.Send(new CommandContent( ApiCommand.C_Login,data: new ClientInfo()
+            Telnet.Instance.Send(new CommandBody( ApiCommand.C_Login,data: new ClientInfo()
             { Name = System.Environment.MachineName, User = new User() { Name = Config.UserName, Password = Config.UserPassword } }));
 
             Config.Save();

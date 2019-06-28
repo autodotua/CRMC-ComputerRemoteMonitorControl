@@ -30,77 +30,68 @@ namespace CRMC.Client.UI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Telnet.Instance.WMINamespacesReceived += (p1, p2) =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    foreach (var wmi in p2.Content.Data as IEnumerable<string>)
-                    {
-                        if (!WMINamespaces.Contains(wmi))
-                        {
-                            WMINamespaces.Add(wmi);
-                        }
-                    }
-                });
-            };
-            Telnet.Instance.WMIClassesReceived += (p1, p2) =>
-              {
-                  Dispatcher.Invoke(() =>
-                  {
-                      WMIClassess.Clear();
-                      foreach (var wmi in p2.Content.Data as IEnumerable<WMIClassInfo>)
-                      {
-                          if (wmi.Namespace == SelectedNamespace && !WMIClassess.Contains(wmi.Class))
-                          {
-                              WMIClassess.Add(wmi.Class);
-                          }
-                      }
-                      StopLoading();
-                  });
-              };
-            Telnet.Instance.WMIPropsReceived += (p1, p2) =>
-              {
-                  Dispatcher.Invoke(() =>
-                  {
-                      WMIProperties.Clear();
-                      WMIObjects.Clear();
-                      data = p2.Content.Data as WMIObjectCollection;
-                      if (data.Namespace != SelectedNamespace || data.Class != SelectedClass)
-                      {
-                          return;
-                      }
-                      foreach (WMIPropertyCollection props in data)
-                      {
-                          WMIObjects.Add(props.Name);
-                      }
-                      if(WMIObjects.Count>0)
-                      {
-                          SelectedWMIObject = WMIObjects[0];
-                      }
-
-                      if (lvw.View is GridView gv)
-                      {
-                          foreach (var c in gv.Columns)
-                          {
-                              // Code below was found in GridViewColumnHeader.OnGripperDoubleClicked() event handler (using Reflector)
-                              // i.e. it is the same code that is executed when the gripper is double clicked
-                              if (double.IsNaN(c.Width))
-                              {
-                                  c.Width = c.ActualWidth;
-                              }
-                              c.Width = double.NaN;
-                          }
-
-                          StopLoading();
-                      }
-                  });
-
-                
-              };
+            Telnet.Instance.WMINamespacesReceived += WMINamespacesReceived;
+            Telnet.Instance.WMIClassesReceived += WMIClassesReceived;
+            Telnet.Instance.WMIPropsReceived += WMIPropsReceived;
 
 
-            Telnet.Instance.Send(new CommandContent(WMI_AskForNamespaces, Global.CurrentClient.Id, ControlledClient.Id));
+            Telnet.Instance.Send(new CommandBody(WMI_AskForNamespaces, Global.CurrentClient.Id, ControlledClient.Id));
         }
+
+        private void WMIPropsReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                WMIProperties.Clear();
+                WMIObjects.Clear();
+                data = e.Content.Data as WMIObjectCollection;
+                if (data.Namespace != SelectedNamespace || data.Class != SelectedClass)
+                {
+                    return;
+                }
+                foreach (WMIPropertyCollection props in data)
+                {
+                    WMIObjects.Add(props.Name);
+                }
+                if (WMIObjects.Count > 0)
+                {
+                    SelectedWMIObject = WMIObjects[0];
+                }
+                RefreshGridViewColumns(lvw);
+            });
+
+        }
+
+        private void WMIClassesReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                WMIClassess.Clear();
+                foreach (var wmi in e.Content.Data as IEnumerable<WMIClassInfo>)
+                {
+                    if (wmi.Namespace == SelectedNamespace && !WMIClassess.Contains(wmi.Class))
+                    {
+                        WMIClassess.Add(wmi.Class);
+                    }
+                }
+                StopLoading();
+            });
+        }
+
+        private void WMINamespacesReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var wmi in e.Content.Data as IEnumerable<string>)
+                {
+                    if (!WMINamespaces.Contains(wmi))
+                    {
+                        WMINamespaces.Add(wmi);
+                    }
+                }
+            });
+        }
+
         public WMIObjectCollection data = null;
         public string SelectedNamespace
         {
@@ -108,7 +99,7 @@ namespace CRMC.Client.UI
             set
             {
                 selectedNamespace = value;
-                Telnet.Instance.Send(new CommandContent(WMI_AskForClasses, Global.CurrentClient.Id, ControlledClient.Id, value));
+                Telnet.Instance.Send(new CommandBody(WMI_AskForClasses, Global.CurrentClient.Id, ControlledClient.Id, value));
                 StartLoading();
             }
         }
@@ -120,7 +111,7 @@ namespace CRMC.Client.UI
                 selectedClass = value;
                 if (value != null)
                 {
-                    Telnet.Instance.Send(new CommandContent(WMI_AskForProps, Global.CurrentClient.Id, ControlledClient.Id, new WMIClassInfo() { Namespace = SelectedNamespace, Class = value }));
+                    Telnet.Instance.Send(new CommandBody(WMI_AskForProps, Global.CurrentClient.Id, ControlledClient.Id, new WMIClassInfo() { Namespace = SelectedNamespace, Class = value }));
                     StartLoading();
                 }
             }

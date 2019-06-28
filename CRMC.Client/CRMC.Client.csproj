@@ -95,12 +95,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controlled\FileSystem.cs" />
     <Compile Include="Controlled\WMI.cs" />
     <Compile Include="Controlled\Screen.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Telnet.cs" />
     <Compile Include="UI\CtrlWinBase.cs" />
+    <Compile Include="UI\Dialog\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\MarginSetter.cs" />
+    <Compile Include="UI\WinFileSystem.xaml.cs">
+      <DependentUpon>WinFileSystem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\WinWMI.xaml.cs">
       <DependentUpon>WinWMI.xaml</DependentUpon>
     </Compile>
@@ -114,6 +121,10 @@
     <Compile Include="UI\PageLogin.xaml.cs">
       <DependentUpon>PageLogin.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\Dialog\ProgressDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\WinMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -127,6 +138,10 @@
       <DependentUpon>WinMain.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\WinFileSystem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\WinWMI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

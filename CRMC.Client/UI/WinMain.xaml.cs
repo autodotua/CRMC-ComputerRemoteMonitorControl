@@ -12,7 +12,6 @@ namespace CRMC.Client
         public WinMain()
         {
             InitializeComponent();
-            TaskDialog.DefaultOwner = this;
             frame.Navigated += (p1, p2) =>
               {
                 

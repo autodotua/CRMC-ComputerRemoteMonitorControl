@@ -21,7 +21,8 @@
 
         <StackPanel Orientation="Horizontal" local:MarginSetter.Margin="6">
             <flat:Button Click="ScreenControlButtonClick">屏幕监控</flat:Button>
-            <flat:Button Click="Button_Click">系统硬件信息</flat:Button>
+            <flat:Button Click="ButtonWMIClick">WMI信息</flat:Button>
+            <flat:Button Click="ButtonFileSystemClick">文件系统</flat:Button>
         </StackPanel>
         <flat:ListView x:Name="lvw" Grid.Row="2
                        " ItemsSource="{Binding Clients}">

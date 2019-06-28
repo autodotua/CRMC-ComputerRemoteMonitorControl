@@ -47,12 +47,14 @@ namespace CRMC.Server
         private void ClientDataReceived(object sender, DataReceivedEventArgs e)
         {
             var command = e.Content.Command;
+            var body = e.Content;
+            var data = e.Content.Data;
             Debug.WriteLine("服务端接收到：" + command);
             switch (command)
             {
                 case C_Login:
 
-                    ClientInfo client = e.Content.Data as ClientInfo;
+                    ClientInfo client = data as ClientInfo;
 
                     try
                     {
@@ -62,13 +64,13 @@ namespace CRMC.Server
                         client.Telnet = this;
                         client.OnlineTime = DateTime.Now;
                         Client = client;
-                        Send(new CommandContent(S_LoginFeedback, default, default, new LoginFeedback() { Success = true, Message = "登录成功", User = user, Client = client }));
+                        Send(new CommandBody(S_LoginFeedback, default, default, new LoginFeedback() { Success = true, Message = "登录成功", User = user, Client = client }));
                         Clients.Add(client);
                         SendClientListToAllClients();
                     }
                     catch (Exception ex)
                     {
-                        Send(new CommandContent(S_LoginFeedback, default, default, new LoginFeedback() { Success = false, Message = "登录失败：" + ex.Message }));
+                        Send(new CommandBody(S_LoginFeedback, default, default, new LoginFeedback() { Success = false, Message = "登录失败：" + ex.Message }));
                     }
                     //client.Telnet = new Telnet() { ClientSocket = p2.Instance.ClientSocket };
                     //Clients.Add(client);
@@ -80,15 +82,15 @@ namespace CRMC.Server
                 case Screen_NewScreen:
                     foreach (var link1 in Links.Where(p => p.Controlled == Client))
                     {
-                        link1.Control.Telnet.Send(new CommandContent(Screen_NewScreen, link1.Control.Id, Client.Id, e.Content.Data));
+                        link1.Control.Telnet.Send(new CommandBody(Screen_NewScreen, link1.Control.Id, Client.Id, e.Content.Data));
                     }
-                    Send(new CommandContent(Screen_AskForNextScreen, default, default, default));
+                    Send(new CommandBody(Screen_AskForNextScreen, default, default, default));
                     break;
                 case C_AskForClientList:
-                    Send(new CommandContent(S_ClientsUpdate, default, default, Clients));
+                    Send(new CommandBody(S_ClientsUpdate, default, default, Clients));
                     break;
                 case Screen_AskForStartScreen:
-                    ForwardAToB(e, (p1, p2) => { Links.Add(new ControlLink(Screen, Client, Clients.First(p=>p.Id==p2.BId))); });
+                    ForwardAToB(e, (p1, p2) => { Links.Add(new ControlLink(Screen, Client, Clients.First(p => p.Id == p2.BId))); });
                     break;
                 case Screen_AskForStopScreen:
                     {
@@ -115,6 +117,70 @@ namespace CRMC.Server
                 case WMI_Props:
                     ForwardBToA(e);
                     break;
+
+                case File_AskForRootDirectory:
+                case File_AskForDirectoryContent:
+                case File_AskForDownloading:
+                case File_AskForCancelDownload:
+                    ForwardAToB(e);
+                    break;
+
+                case File_RootDirectory:
+                case File_DirectoryContent:
+                case File_ReadDownloadFileError:
+                    ForwardBToA(e);
+                    break;
+                case File_Download:
+                    var download = body.Data as DownloadPartInfo;
+                    //downloadParts.Add(body);
+                    Common.Telnet a = Clients.First(p => p.Id == body.AId).Telnet;
+
+                    a.Send(body);
+                    Send(new CommandBody(File_CanSendDownloadPartAgain, body.AId, body.BId,download.ID ));
+
+                    //if (download.Position == 0)
+                    //{
+                    //    //Task task = new Task(() =>
+                    //    //{
+                    //    //    StartDownloadingToA(body);
+                    //    //});
+                    //    //download.Task = task;
+                    //    StartDownloadingToA(body);
+                    //    //task.Start();
+                    //}
+                    break;
+
+            }
+        }
+        int count = 0;
+
+        public List<CommandBody> downloadParts = new List<CommandBody>();
+
+        public async Task StartDownloadingToA(CommandBody body)
+        {
+            Common.Telnet a = Clients.First(p => p.Id == body.AId).Telnet;
+
+            DownloadPartInfo download = body.Data as DownloadPartInfo;
+            long currentLength = 0;
+            int count = 0;
+            while (true)
+            {
+                if (currentLength == download.Length)
+                {
+                    return;
+                }
+                var part = downloadParts.FirstOrDefault(p => p.AId == body.AId && p.BId == body.BId
+                  && (p.Data as DownloadPartInfo).Path == download.Path);
+                if (part == null)
+                {
+
+                    await Task.Delay(50);
+                    continue;
+                }
+                Debug.WriteLine("发送了"+ ++count);
+                a.Send(part);
+                currentLength += (part.Data as DownloadPartInfo).Content.Length;
+                downloadParts.Remove(part);
             }
         }
 
@@ -124,7 +190,7 @@ namespace CRMC.Server
             a.Send(e.Content);
         }
 
-        public void ForwardAToB(DataReceivedEventArgs e, Action<ClientInfo, CommandContent> doWhat = null)
+        public void ForwardAToB(DataReceivedEventArgs e, Action<ClientInfo, CommandBody> doWhat = null)
         {
             Guid guid = e.Content.BId;
             ClientInfo targetClient = Clients.FirstOrDefault(p => p.Id.Equals(guid));
@@ -147,7 +213,7 @@ namespace CRMC.Server
             {
                 if (link.Control == Client)
                 {
-                    link.Controlled.Telnet.Send(new CommandContent(Screen_AskForStopScreen, default, link.Controlled.Id, null));
+                    link.Controlled.Telnet.Send(new CommandBody(Screen_AskForStopScreen, default, link.Controlled.Id, null));
                 }
                 Links.Remove(link);
             }
@@ -156,14 +222,14 @@ namespace CRMC.Server
 
         private void SendNoSuchClient(Guid guid)
         {
-            Send(new CommandContent(S_NoSuchClient, Client.Id, guid, null));
+            Send(new CommandBody(S_NoSuchClient, Client.Id, guid, null));
         }
 
         private void SendClientListToAllClients()
         {
             foreach (var client in Clients)
             {
-                client.Telnet.Send(new CommandContent(S_ClientsUpdate, default, default, Clients));
+                client.Telnet.Send(new CommandBody(S_ClientsUpdate, default, default, Clients));
             }
         }
 

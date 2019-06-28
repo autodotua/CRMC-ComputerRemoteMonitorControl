@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FzLib.Program.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -15,11 +16,12 @@ namespace CRMC.Client
     {
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
+            UnhandledException.RegistAll();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            Telnet.Instance.Send(new Common.Model.CommandContent(Common.ApiCommand.C_Exit));
+            Telnet.Instance.Send(new Common.Model.CommandBody(Common.ApiCommand.C_Exit));
         }
     }
     

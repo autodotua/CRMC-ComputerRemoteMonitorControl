@@ -37,7 +37,7 @@ namespace CRMC.Client.UI
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
-            Telnet.Instance.Send(new CommandContent(ApiCommand.C_AskForClientList,default,default,default));
+            Telnet.Instance.Send(new CommandBody(ApiCommand.C_AskForClientList,default,default,default));
         }
 
         public ExtendedObservableCollection<Common.Model.ClientInfo> Clients { get; } = new ExtendedObservableCollection<CRMC.Common.Model.ClientInfo>();
@@ -48,11 +48,17 @@ namespace CRMC.Client.UI
             new WinScreen(SelectedClient).Show();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ButtonWMIClick(object sender, RoutedEventArgs e)
         {
             Debug.Assert(SelectedClient != null);
             new WinWMI(SelectedClient).Show();
 
+        }
+
+        private void ButtonFileSystemClick(object sender, RoutedEventArgs e)
+        {
+            Debug.Assert(SelectedClient != null);
+            new WinFileSystem(SelectedClient).Show();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace CRMC.Client.UI
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Telnet.Instance.ReceivedNewImage += ReceivedNewImage;
-            Telnet.Instance.Send(new CommandContent(ApiCommand.Screen_AskForStartScreen, Global.CurrentClient.Id, ControlledClient.Id, ControlledClient.Id.ToByteArray()));
+            Telnet.Instance.Send(new CommandBody(ApiCommand.Screen_AskForStartScreen, Global.CurrentClient.Id, ControlledClient.Id, ControlledClient.Id.ToByteArray()));
 
         }
 
@@ -76,7 +76,7 @@ namespace CRMC.Client.UI
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Telnet.Instance.Send(new CommandContent(ApiCommand.Screen_AskForStopScreen, Global.CurrentClient.Id, ControlledClient.Id, ControlledClient.Id.ToByteArray()));
+            Telnet.Instance.Send(new CommandBody(ApiCommand.Screen_AskForStopScreen, Global.CurrentClient.Id, ControlledClient.Id, ControlledClient.Id.ToByteArray()));
         }
     }
 }

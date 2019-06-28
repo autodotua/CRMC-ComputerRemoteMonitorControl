@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace CRMC.Common.Model
 {
     [Serializable]
-    public class CommandContent
+    public class CommandBody
     {
-        public CommandContent(ApiCommand command, Guid aId=default,Guid bId=default, object data=null)
+        public CommandBody(ApiCommand command, Guid aId=default,Guid bId=default, object data=null)
         {
             Command = command;
             AId = aId;

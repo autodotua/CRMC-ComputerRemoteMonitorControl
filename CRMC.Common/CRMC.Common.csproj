@@ -60,6 +60,7 @@
     <Compile Include="ApiCommonds.cs" />
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\Db.cs" />
+    <Compile Include="Model\FileSystem.cs" />
     <Compile Include="Model\LoginFeedback.cs" />
     <Compile Include="Model\CommandContent.cs" />
     <Compile Include="Model\User.cs" />
