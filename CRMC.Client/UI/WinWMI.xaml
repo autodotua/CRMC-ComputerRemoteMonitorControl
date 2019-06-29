@@ -9,6 +9,7 @@
        xmlns:win10="clr-namespace:FzLib.Control.Win10Style;assembly=FzWpfControlLib"
       xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
         mc:Ignorable="d"
+    Title="WMI查看——计算机远程监控系统（客户端）"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded">
 

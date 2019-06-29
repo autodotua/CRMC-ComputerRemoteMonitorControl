@@ -19,7 +19,7 @@ namespace CRMC.Client.UI
             ControlledClient = client;
             Telnet.Instance.NoSuchClient += (p1, p2) =>
               {
-                  if (p2.Content.BId == client.Id)
+                  if (p2.Content.BId == client.ID)
                   {
                       Dispatcher.Invoke(() =>
                       {

@@ -200,6 +200,7 @@ namespace CRMC.Common
         {
             Send(Serialize(content));
 
+            DataSended?.Invoke(this, new DataReceivedEventArgs(content));
         }
         private void Send(byte[] data)
         {
@@ -308,9 +309,18 @@ namespace CRMC.Common
 
             //public byte Command { get; private set; }
             public CommandBody Content { get; private set; }
+        }
+        public event EventHandler<DataReceivedEventArgs> DataSended;
+        public class DataSendedEventArgs : EventArgs
+        {
+            public DataSendedEventArgs(CommandBody datas)
+            {
+                //Command = command;
+                Content = datas;
+            }
 
-
-
+            //public byte Command { get; private set; }
+            public CommandBody Content { get; private set; }
         }
 
 

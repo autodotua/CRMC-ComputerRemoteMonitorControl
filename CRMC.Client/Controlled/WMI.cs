@@ -19,7 +19,7 @@ namespace CRMC.Client.Controlled
         {
             if (startGettingNamespaces)
             {
-                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.Id, namespaces));
+                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.ID, namespaces));
                 return;
             }
             startGettingNamespaces = true;
@@ -38,7 +38,6 @@ namespace CRMC.Client.Controlled
                         new ManagementScope(root),
                         new ManagementPath("__namespace"),
                         null);
-                    ManagementObjectCollection n = null;
                     try
                     {
                         foreach (ManagementObject ns in nsClass.GetInstances())
@@ -47,7 +46,7 @@ namespace CRMC.Client.Controlled
                             string namespaceName = root + "\\" + ns["Name"].ToString();
                             // items.Add(namespaceName);
                             namespaces.Add(namespaceName);
-                            Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.Id, new string[] { namespaceName }));
+                            Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Namespace,cmd.AId, Global.CurrentClient.ID, new string[] { namespaceName }));
 
                             await GetNamespaces(namespaceName);
 
@@ -68,7 +67,7 @@ namespace CRMC.Client.Controlled
                 var items = GetWMIClasses(@namespace).classes;
                 var classes = from x in items select new WMIClassInfo() { Namespace = @namespace, Class = x };
 
-                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Classes,cmd.AId, Global.CurrentClient.Id,classes.ToArray()));
+                Telnet.Instance.Send( new CommandBody(Common.ApiCommand.WMI_Classes,cmd.AId, Global.CurrentClient.ID,classes.ToArray()));
             });
         }
 
@@ -114,7 +113,7 @@ namespace CRMC.Client.Controlled
         {
             Task.Run(() =>
             {
-                Telnet.Instance.Send(new CommandBody(Common.ApiCommand.WMI_Props, cmd.AId, Global.CurrentClient.Id, GetProperties(wmi)));
+                Telnet.Instance.Send(new CommandBody(Common.ApiCommand.WMI_Props, cmd.AId, Global.CurrentClient.ID, GetProperties(wmi)));
             });
         }
 

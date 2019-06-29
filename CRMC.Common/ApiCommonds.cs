@@ -42,11 +42,23 @@
         File_AskForDirectoryContent,
         File_DirectoryContent,
 
+        //以下为下载
         File_AskForDownloading,
         File_Download,
-        File_CanSendDownloadPartAgain,
-        File_ReadDownloadFileError,
+        File_CanSendNextDownloadPart,
+        File_ReadDownloadingFileError,
         File_AskForCancelDownload,
+
+        //以下为上传
+        File_AskForStartUpload,
+        File_PrepareUploadingFeedback,
+        File_Upload,
+        File_CanSendNextUploadPart,
+        File_WriteUploadingFileError,
+        File_AskForCancelUpload,
+
+        File_Operation,
+        File_OperationFeedback
 
 
         #endregion

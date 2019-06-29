@@ -10,7 +10,7 @@
         Loaded="Window_Loaded"
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="计算机远程监控系统——服务端" Height="450" Width="800">
+        Title="计算机远程监控系统——服务端" Height="600" Width="1200">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -44,7 +44,9 @@
             <flat:ListView.View>
                 <GridView>
                     <GridViewColumn Header="时间" DisplayMemberBinding="{Binding Time}"/>
-                    <GridViewColumn Header="客户端IP" Width="96"  DisplayMemberBinding="{Binding IP}"/>
+                    <GridViewColumn Header="客户端IP" Width="96"  DisplayMemberBinding="{Binding ClientIP}"/>
+                    <GridViewColumn Header="客户端名" Width="96"  DisplayMemberBinding="{Binding ClientName}"/>
+                    <GridViewColumn Header="客户端ID" Width="280"  DisplayMemberBinding="{Binding ClientID}"/>
                     <GridViewColumn Header="内容" Width="512" DisplayMemberBinding="{Binding Content}"/>
                 </GridView>
             </flat:ListView.View>

@@ -98,6 +98,7 @@
     <Compile Include="Controlled\FileSystem.cs" />
     <Compile Include="Controlled\WMI.cs" />
     <Compile Include="Controlled\Screen.cs" />
+    <Compile Include="Control\FileSystem.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Telnet.cs" />
     <Compile Include="UI\CtrlWinBase.cs" />

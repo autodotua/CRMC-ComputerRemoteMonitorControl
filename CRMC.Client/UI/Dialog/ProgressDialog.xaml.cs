@@ -60,11 +60,12 @@ namespace CRMC.Client.UI.Dialog
             get => minimum;
             set => SetValueAndNotify(ref minimum, value, nameof(Minimum));
         }
-
+        public bool Canceled { get; private set; } = false;
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (buttonLabel == "取消")
             {
+                Canceled = true;
                 Cancle?.Invoke(sender, e);
             }
             closing = true;

@@ -16,10 +16,10 @@ namespace CRMC.Common.Model
 
         public ClientInfo()
         {
-            Id = Guid.NewGuid();
+            ID = Guid.NewGuid();
         }
 
-        public Guid Id { get; set; }
+        public Guid ID { get; set; }
         public string Name { get; set; }
         public Telnet Telnet { get => telnet; set => telnet = value; }
         public User User { get; set; }

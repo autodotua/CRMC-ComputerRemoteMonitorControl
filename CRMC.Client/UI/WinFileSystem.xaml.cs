@@ -16,6 +16,8 @@ using FzLib.Control.Dialog;
 using System.IO;
 using CRMC.Client.UI.Dialog;
 using FzLib.Basic;
+using CRMC.Client.Control;
+using System.Threading.Tasks;
 
 namespace CRMC.Client.UI
 {
@@ -58,58 +60,31 @@ namespace CRMC.Client.UI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Telnet.Instance.FileSystemDownloadErrorReceived += FileSystemDownloadErrorReceived;
+
             Telnet.Instance.FileSystemRootReceived += FileSystemRootReceived;
             Telnet.Instance.FileSystemDirectoryContentReceived += FileSystemDirectoryContentReceived;
-            Telnet.Instance.FileSystemDownloadPartReceived += FileSystemDownloadPartReceived;
-            Telnet.Instance.Send(new CommandBody(File_AskForRootDirectory, Global.CurrentClient.Id, ControlledClient.Id));
+            Telnet.Instance.FileSystemFileFolderOperationFeedback += FileFolderOperationFeedback;
+            Telnet.Instance.Send(new CommandBody(File_AskForRootDirectory, Global.CurrentClient.ID, ControlledClient.ID));
+
         }
 
-        private void FileSystemDownloadErrorReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
+        private void FileFolderOperationFeedback(object sender, Common.Telnet.DataReceivedEventArgs e)
         {
-            Debug.Assert(currentDownload != null);
-            currentDownload.Dialog.Message = "下载失败：" + (e.Content.Data as DownloadError).Error;
-            currentDownload.Dialog.SetToError();
+            var feedback = e.Content.Data as FileFolderFeedback;
 
-            currentDownload.Dispose(true);
-           
-            currentDownload = null;
-
+            Dispatcher.Invoke(() =>
+            {
+                if (feedback.HasError)
+                {
+                    SnakeBar.ShowError(this, feedback.Message);
+                }
+                else
+                {
+                    SnakeBar.Show(this, feedback.Message);
+                }
+                RefreshButtonClick(null, null);
+            });
         }
-
-        private void FileSystemDownloadPartReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
-        {
-            Debug.Assert(currentDownload != null);
-            DownloadPartInfo download = e.Content.Data as DownloadPartInfo;
-
-            if (currentDownload.ID!= download.ID)
-            {
-                return;
-            }
-            if(currentDownload.Canceled)
-            {
-                return;
-            }
-
-            currentDownload.Stream.Position = download.Position;
-            currentDownload.Stream.Write(download.Content, 0, download.Content.Length);
-
-            currentDownload.Dialog.Value = 1.0 * currentDownload.Stream.Position / download.Length;
-            currentDownload.Dialog.Message = $"正在下载{  currentDownload.File.Name}：{Number.ByteToFitString(currentDownload.Stream.Position)}/{Number.ByteToFitString(download.Length)}";
-
-            if (download.Position + download.Content.Length == download.Length)
-            {
-                currentDownload.Dialog.Message = "下载成功";
-
-                currentDownload.Dispose();
-                currentDownload = null;
-            }
-
-        }
-
-
-
-        public DownloadingFileInfo currentDownload;
 
         private void FileSystemRootReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
         {
@@ -125,7 +100,13 @@ namespace CRMC.Client.UI
                 Drives.Clear();
                 Drives.AddRange(drives);
                 SelectedDrive = Drives[0];
+
+#if DEBUG
+                txtPath.Text = @"C:\Users\admin\Desktop\test";
+                JumpToFolderButtonClick(null, null);
+#endif
             });
+
         }
 
 
@@ -158,7 +139,14 @@ namespace CRMC.Client.UI
         private void LvwItemPreviewMouseLeftButtonDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Debug.Assert(SelectedFile != null);
-            OpenFolder(SelectedFile.Path);
+            if (SelectedFile.IsDirectory)
+            {
+                OpenFolder(SelectedFile.Path);
+            }
+            else
+            {
+                DownloadMenuClick(null, null);
+            }
         }
         private string currentPath = null;
         public string CurrentPath
@@ -185,18 +173,30 @@ namespace CRMC.Client.UI
             OpenFolder(txtPath.Text);
         }
 
-        private void OpenFolder(string path)
+        public void RefreshFolder()
         {
-            var existedFiles = openedFolders.FirstOrDefault(p => p.Path == path);
+            var existedFiles = openedFolders.FirstOrDefault(p => p.Path == CurrentPath);
             if (existedFiles != null)
             {
-                Files.Clear();
-                Files.AddRange(existedFiles);
-                CurrentPath = existedFiles.Path;
-                return;
+                openedFolders.Remove(existedFiles);
             }
-            StartLoading();
-            Telnet.Instance.Send(new CommandBody(File_AskForDirectoryContent, Global.CurrentClient.Id, ControlledClient.Id, path));
+            OpenFolder(CurrentPath, false);
+        }
+        private void OpenFolder(string path, bool allowCache = true)
+        {
+            if (allowCache)
+            {
+                var existedFiles = openedFolders.FirstOrDefault(p => p.Path == path);
+                if (existedFiles != null)
+                {
+                    Files.Clear();
+                    Files.AddRange(existedFiles);
+                    CurrentPath = existedFiles.Path;
+                    return;
+                }
+            }
+            //StartLoading();
+            Telnet.Instance.Send(new CommandBody(File_AskForDirectoryContent, Global.CurrentClient.ID, ControlledClient.ID, path));
         }
 
         private void LvwPreviewMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -227,6 +227,7 @@ namespace CRMC.Client.UI
             else
             {
                 menu = FindResource("menuEmpty") as ContextMenu;
+                (menu.Items[0] as MenuItem).Visibility = (ongoingOperation == null) ? Visibility.Collapsed : Visibility.Visible;
             }
 
             menu.IsOpen = true;
@@ -234,30 +235,62 @@ namespace CRMC.Client.UI
 
         private void DownloadMenuClick(object sender, RoutedEventArgs e)
         {
-            string path = FileSystemDialog.GetSaveFile(null, true, false, SelectedFile.Name);
-            if (path != null)
-            {
-                DownloadInfo download = new DownloadInfo() { File = SelectedFile };
-                try
-                {
-                    currentDownload = new DownloadingFileInfo(this,ControlledClient, path, download);
-                }
-                catch (Exception ex)
-                {
-                    TaskDialog.ShowException(ex, "建立本地文件失败！");
-                    return;
-                }
-                Telnet.Instance.Send(new CommandBody(
-     File_AskForDownloading, Global.CurrentClient.Id, ControlledClient.Id, download));
-
-                currentDownload.Dialog.ShowDialog();
-
-
-            }
+            FileDownloadHelper download = new FileDownloadHelper();
+            download.StartNew(this, ControlledClient, SelectedFile);
         }
 
         private void PasteMenuClick(object sender, RoutedEventArgs e)
         {
+            ongoingOperation.Target = Path.Combine(CurrentPath, Path.GetFileName(ongoingOperation.Source));
+
+            bool ok = true;
+            if (Files.Any(p => p.Path == ongoingOperation.Target))
+            {
+                if (TaskDialog.ShowWithYesNoButtons("可能存在相同名称的文件（夹），是否覆盖？", "文件" + ongoingOperation.Target + "可能已存在") == false)
+                {
+                    ok = false;
+                }
+            }
+            if (ok)
+            {
+                Telnet.Instance.Send(new CommandBody(File_Operation, Global.CurrentClient.ID, ControlledClient.ID, ongoingOperation));
+                SnakeBar.Show("已通知被控端进行" + ongoingOperation.OperationDescription + "操作");
+                if(ongoingOperation.Operation!=FileFolderOperation.Copy)
+                {
+                    ongoingOperation = null;
+                }
+            }
+
+        }
+
+        private void UploadMenuClick(object sender, RoutedEventArgs e)
+        {
+            FileUploadHelper uploadHelper = new FileUploadHelper();
+            uploadHelper.StartNew(this, ControlledClient, CurrentPath);
+        }
+
+        private void RefreshButtonClick(object sender, RoutedEventArgs e)
+        {
+            RefreshFolder();
+        }
+
+        private void CopyButtonClick(object sender, RoutedEventArgs e)
+        {
+            ongoingOperation = new FileFolderOperationInfo() { Source = SelectedFile.Path, Operation = FileFolderOperation.Copy };
+        }
+
+        public FileFolderOperationInfo ongoingOperation = null;
+
+        private void CutButtonClick(object sender, RoutedEventArgs e)
+        {
+            ongoingOperation = new FileFolderOperationInfo() { Source = SelectedFile.Path, Operation = FileFolderOperation.Move };
+        }
+
+        private void DeleteButtonClick(object sender, RoutedEventArgs e)
+        {
+            var op = new FileFolderOperationInfo() { Source = SelectedFile.Path, Operation = FileFolderOperation.Delete };
+            Telnet.Instance.Send(new CommandBody(File_Operation, Global.CurrentClient.ID, ControlledClient.ID,   op));
+            SnakeBar.Show("已通知被控端进行" + op.OperationDescription + "操作");
 
         }
     }
@@ -281,63 +314,4 @@ namespace CRMC.Client.UI
         }
     }
 
-    public class DownloadingFileInfo : IDisposable
-    {
-        public DownloadingFileInfo(Window win,ClientInfo controlledClient, string localPath, DownloadInfo download)
-        {
-            LocalPath = localPath;
-            File = download.File;
-            ID = download.ID;
-            Dialog = new ProgressDialog(win) { Message = "正在下载" + File.Name };
-            Dialog.Value = 0;
-            Dialog.Minimum = 0;
-            Dialog.Maximum = 1;
-            Dialog.Cancle += (p1, p2) =>
-              {
-                  Canceled = true;
-                  Dispose(true);
-
-                  Telnet.Instance.Send(new CommandBody(
-File_AskForCancelDownload, Global.CurrentClient.Id, controlledClient.Id, ID));
-
-              };
-
-            Stream = System.IO.File.OpenWrite(localPath);
-            Stream.SetLength(File.Length);
-
-        }
-
-        public string LocalPath { get; private set; }
-        public Guid ID { get; private set; }
-        public FileStream Stream { get; private set; }
-        public FileFolderInfo File { get; private set; }
-        public ProgressDialog Dialog { get; private set; }
-        public bool Canceled { get;private set; } = false;
-
-        public void Dispose()
-        {
-            Dispose(false);
-        }
-        public void Dispose(bool failed)
-        {
-            Dialog.ButtonLabel = "关闭";
-            Stream?.Flush();
-            Stream?.Dispose();
-
-            if(failed)
-            {
-                if (System.IO. File.Exists(LocalPath))
-                {
-                    try
-                    {
-                        System.IO.File.Delete(LocalPath);
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
-        }
-    }
 }

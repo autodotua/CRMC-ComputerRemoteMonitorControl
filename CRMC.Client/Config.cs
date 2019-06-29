@@ -31,5 +31,13 @@ namespace CRMC.Client
         public string UserPassword { get; set; } = "000000";
 
         public static User CurrentUser;
+
+#if DEBUG
+
+        public override void Save()
+        {
+
+        }
+#endif
     }
 }

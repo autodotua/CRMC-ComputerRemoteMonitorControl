@@ -27,7 +27,7 @@ namespace CRMC.Client
         {
             DataReceived += async (s, e) =>
              {
-                 var command = (ApiCommand)e.Content.Command;
+                 var command = e.Content.Command;
                  Debug.WriteLine("客户端接收到：" + command);
 
 
@@ -70,8 +70,22 @@ namespace CRMC.Client
                      case File_Download:
                          FileSystemDownloadPartReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
-                     case File_ReadDownloadFileError:
+                     case File_ReadDownloadingFileError:
                          FileSystemDownloadErrorReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+                         break;
+
+                     case File_PrepareUploadingFeedback:
+                         FileSystemPrepareForUploadingReceived?.Invoke(this, new DataReceivedEventArgs(e.Content));
+
+                         break;
+                     case File_CanSendNextUploadPart:
+                         Control.FileUploadHelper.CanSendNextPart.Add((Guid)e.Content.Data);
+                         break;
+                     case File_WriteUploadingFileError:
+                         Control.FileUploadHelper.Error.TryAdd((e.Content.Data as FileFolderFeedback).ID, (e.Content.Data as FileFolderFeedback).Message);
+                         break;
+                     case File_OperationFeedback:
+                         FileSystemFileFolderOperationFeedback?.Invoke(this, new DataReceivedEventArgs(e.Content));
                          break;
 
                      //以下为被控端
@@ -93,6 +107,8 @@ namespace CRMC.Client
                      case WMI_AskForProps:
                          WMIHelper.SendProperties(e.Content.Data as WMIClassInfo, e.Content);
                          break;
+
+
                      case File_AskForRootDirectory:
                          FileSystemHelper.SendDiskDrives(e.Content);
                          break;
@@ -102,14 +118,25 @@ namespace CRMC.Client
                      case File_AskForDownloading:
                          FileSystemHelper.StartDownloadingToA(e.Content);
                          break;
-                     case File_CanSendDownloadPartAgain:
+                     case File_CanSendNextDownloadPart:
                          FileSystemHelper.CanSendNextPart.Add((Guid)e.Content.Data);
                          break;
                      case File_AskForCancelDownload:
                          FileSystemHelper.Cancle.Add((Guid)e.Content.Data);
                          break;
 
-
+                     case File_AskForStartUpload:
+                         FileSystemHelper.StartAcceptingUploading(e.Content);
+                         break;
+                     case File_Upload:
+                         FileSystemHelper.AcceptUploadPartFromA(e.Content);
+                         break;
+                     case File_AskForCancelUpload:
+                         FileSystemHelper.CancelUploadFromA(e.Content);
+                         break;
+                     case File_Operation:
+                         FileSystemHelper.FileFolderOperate(e.Content);
+                         break;
                  }
              };
         }
@@ -126,6 +153,8 @@ namespace CRMC.Client
         public event EventHandler<DataReceivedEventArgs> FileSystemDirectoryContentReceived;
         public event EventHandler<DataReceivedEventArgs> FileSystemDownloadPartReceived;
         public event EventHandler<DataReceivedEventArgs> FileSystemDownloadErrorReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemPrepareForUploadingReceived;
+        public event EventHandler<DataReceivedEventArgs> FileSystemFileFolderOperationFeedback;
 
         public static Telnet Instance { get; } = new Telnet();
         public bool CanSendNextScreen { get; private set; } = true;
@@ -218,7 +247,6 @@ namespace CRMC.Client
                     stream.Flush();
                     received = stream.ToArray();
                 }
-                _a:
                 byte command = received[0];
                 byte[] data = new byte[totalLength - 1 - SocketEnd.Length];
                 if (data.Length > 0)

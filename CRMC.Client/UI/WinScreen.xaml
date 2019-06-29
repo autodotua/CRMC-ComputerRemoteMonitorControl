@@ -12,7 +12,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded"
     Closing="WindowClosing"
-        Title="屏幕监控">
+        Title="屏幕监控——计算机远程监控系统（客户端）">
 
     <Grid>
         <Grid.RowDefinitions>

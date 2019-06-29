@@ -69,13 +69,13 @@ namespace CRMC.Common.Model
         public bool IsError => Error != null;
     }
     [Serializable]
-    public class DownloadInfo
+    public class FileTransmissionInfo
     {
         public Guid ID { get; set; } = Guid.NewGuid();
         public FileFolderInfo File { get; set; }
     }
     [Serializable]
-    public class DownloadPartInfo
+    public class FileTransmissionPartInfo
     {
         [NonSerialized]
         private Task task;
@@ -89,11 +89,47 @@ namespace CRMC.Common.Model
     }
 
     [Serializable]
-    public class DownloadError
+    public class FileFolderFeedback
     {
         public Guid ID { get; set; }
         public string Path { get; set; }
-        public string Error { get; set; }
+        public string Message { get; set; }
+        public bool HasError { get; set; }
     }
-    
+    [Serializable]
+    public class FileFolderOperationInfo
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public FileFolderOperation Operation { get; set; } = FileFolderOperation.Unknown;
+        public string OperationDescription
+        {
+            get
+            {
+                switch (Operation)
+                {
+                    case FileFolderOperation.Copy:
+                        return "复制";
+                    case FileFolderOperation.Move:
+                        return "移动";
+                    case FileFolderOperation.Delete:
+                        return "复制";
+                    //case FileFolderOperation.Rename:
+                    //    return "重命名";
+                    default:
+                        return "位置";
+                }
+
+            }
+        }
+    }
+
+    public enum FileFolderOperation
+    {
+        Unknown,
+        Delete,
+        Copy,
+        //Rename,
+        Move
+    }
 }

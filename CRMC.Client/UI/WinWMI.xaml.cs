@@ -35,7 +35,7 @@ namespace CRMC.Client.UI
             Telnet.Instance.WMIPropsReceived += WMIPropsReceived;
 
 
-            Telnet.Instance.Send(new CommandBody(WMI_AskForNamespaces, Global.CurrentClient.Id, ControlledClient.Id));
+            Telnet.Instance.Send(new CommandBody(WMI_AskForNamespaces, Global.CurrentClient.ID, ControlledClient.ID));
         }
 
         private void WMIPropsReceived(object sender, Common.Telnet.DataReceivedEventArgs e)
@@ -99,7 +99,7 @@ namespace CRMC.Client.UI
             set
             {
                 selectedNamespace = value;
-                Telnet.Instance.Send(new CommandBody(WMI_AskForClasses, Global.CurrentClient.Id, ControlledClient.Id, value));
+                Telnet.Instance.Send(new CommandBody(WMI_AskForClasses, Global.CurrentClient.ID, ControlledClient.ID, value));
                 StartLoading();
             }
         }
@@ -111,7 +111,7 @@ namespace CRMC.Client.UI
                 selectedClass = value;
                 if (value != null)
                 {
-                    Telnet.Instance.Send(new CommandBody(WMI_AskForProps, Global.CurrentClient.Id, ControlledClient.Id, new WMIClassInfo() { Namespace = SelectedNamespace, Class = value }));
+                    Telnet.Instance.Send(new CommandBody(WMI_AskForProps, Global.CurrentClient.ID, ControlledClient.ID, new WMIClassInfo() { Namespace = SelectedNamespace, Class = value }));
                     StartLoading();
                 }
             }

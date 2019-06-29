@@ -11,14 +11,12 @@
                 <ResourceDictionary Source="pack://application:,,,/FzWpfControlLib;component/FlatStyle/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Viewbox x:Key="imgFile" Width="18" Height="18" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
+            <Viewbox x:Key="imgFile" Width="18" Height="18" Stretch="Uniform">
                 <Canvas Name="svg3811" Width="1024" Height="1024">
                     <Canvas.RenderTransform>
                         <TranslateTransform X="0" Y="0"/>
                     </Canvas.RenderTransform>
                     <Canvas.Resources/>
-                    <!--Unknown tag: metadata-->
-                    <!--Unknown tag: sodipodi:namedview-->
                     <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path3801" Fill="#FFF9F455">
                         <Path.Data>
                             <PathGeometry Figures="M812.047 319.521L668.064 329h-0.542C636.857 329 612 303.638 612 272.972V119.614c0-7.776 1.518-15.614 4.413-21.614H222.83c-12.2 0-21.83 9.533-21.83 21.614v785.331c0 12.08 9.63 22.056 21.83 22.056h584.785c11.961 0 21.385-9.975 21.385-22.056V316.417c-5 1.813-10.978 3.042-16.953 3.104zM732.828 843h-435.21c-16.89 0-30.582-9.4-30.582-21.5s13.692-21.5 30.582-21.5h435.21c16.89 0 30.582 9.4 30.582 21.5S749.718 843 732.828 843z m0-128h-435.21c-16.89 0-30.582-9.9-30.582-22s13.692-22 30.582-22h435.21c16.89 0 30.582 9.9 30.582 22s-13.692 22-30.582 22z m0-130h-435.21c-16.89 0-30.582-9.9-30.582-22s13.692-22 30.582-22h435.21c16.89 0 30.582 9.9 30.582 22s-13.692 22-30.582 22z m0-129h-435.21c-16.89 0-30.582-9.9-30.582-22s13.692-22 30.582-22h435.21c16.89 0 30.582 9.9 30.582 22s-13.692 22-30.582 22z" FillRule="NonZero"/>
@@ -47,9 +45,7 @@
                 </Canvas>
             </Viewbox>
 
-            <Viewbox x:Key="imgFolder" Width="18" Height="18"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+            <Viewbox x:Key="imgFolder" Width="18" Height="18" >
                 <Canvas Width="261.837" Height="199.999">
 
                     <Canvas>
@@ -60,15 +56,10 @@
                 </Canvas>
             </Viewbox>
 
-            <Viewbox x:Key="imgError" Width="18" Height="18"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+            <Viewbox x:Key="imgError" Width="18" Height="18">
                 <Canvas Width="199.992" Height="199.993">
-
                     <Canvas>
-
                         <Path Fill="#ffd71d05" Data="F1 M 187.495,174.997 C 187.495,172.868 186.987,170.865 185.971,169.016 L 185.858,168.805 L 185.760,168.594 L 111.055,19.212 C 108.883,15.065 104.651,12.497 99.996,12.497 C 95.313,12.497 91.067,15.093 88.895,19.282 L 88.303,20.411 L 17.999,161.033 L 18.097,161.132 L 13.893,169.285 C 12.963,171.076 12.497,173.008 12.497,175.011 C 12.497,181.909 18.111,187.510 24.995,187.510 L 174.997,187.510 C 181.895,187.495 187.495,181.895 187.495,174.997 Z M 199.992,174.997 C 199.992,188.806 188.806,199.993 174.997,199.993 L 24.995,199.993 C 11.186,199.993 0.000,188.793 0.000,174.997 C 0.000,170.865 1.015,166.971 2.807,163.530 L 2.793,163.516 L 77.779,13.528 L 77.807,13.528 C 81.954,5.487 90.319,0.000 99.996,0.000 C 109.673,0.000 118.038,5.502 122.199,13.542 L 196.932,163.022 C 198.892,166.562 199.992,170.653 199.992,174.997 Z M 99.996,49.992 C 93.098,49.992 87.499,55.591 87.499,62.489 L 87.499,124.992 C 87.499,131.890 93.098,137.490 99.996,137.490 C 106.894,137.490 112.493,131.890 112.493,124.992 L 112.493,62.489 C 112.493,55.591 106.894,49.992 99.996,49.992 Z M 112.493,162.500 C 112.493,169.398 106.894,174.997 99.996,174.997 C 93.098,174.997 87.499,169.398 87.499,162.500 C 87.499,155.602 93.098,150.001 99.996,150.001 C 106.894,150.001 112.493,155.587 112.493,162.500 Z"/>
-
                     </Canvas>
                 </Canvas>
             </Viewbox>

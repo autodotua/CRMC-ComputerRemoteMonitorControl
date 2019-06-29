@@ -16,7 +16,8 @@ namespace CRMC.Client
 {
     public class ScreenRecoder : IDisposable
     {
-        private bool running, initilized;
+        private bool running;
+        //private bool initilized;
 
         public int Size { get; private set; }
         public ScreenRecoder()
@@ -30,7 +31,8 @@ namespace CRMC.Client
         public Action<byte[]> ScreenCaptured = null;
         Device device;
         Output1 output1;
-        int count = 0; Texture2D screenTexture;
+        //int count = 0;
+        Texture2D screenTexture;
         int width;
         int height;
         OutputDuplication duplicatedOutput;
@@ -145,7 +147,7 @@ namespace CRMC.Client
                         bytes = ms.ToArray();
                         ScreenCaptured?.Invoke(bytes);
                         //ScreenRefreshed?.Invoke(this, ms.ToArray());
-                        initilized = true;
+                        //initilized = true;
                     }
                 }
                 screenResource.Dispose();

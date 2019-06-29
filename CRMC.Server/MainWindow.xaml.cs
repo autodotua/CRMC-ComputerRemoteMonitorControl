@@ -1,6 +1,8 @@
-﻿using FzLib.Control.Dialog;
+﻿using CRMC.Common.Model;
+using FzLib.Control.Dialog;
 using System;
 using System.Collections.ObjectModel;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -8,13 +10,17 @@ namespace CRMC.Server
 {
     public class LogInfo
     {
-        public LogInfo(string content,string ip)
+        public LogInfo(string content, string ip, string clientName, Guid? clientID)
         {
             Time = DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss");
-            IP = ip;
+            ClientIP = ip;
             Content = content;
+            ClientID = clientID;
+            ClientName = clientName;
         }
-        public string IP { get; }
+        public Guid? ClientID { get; }
+        public string ClientName { get; }
+        public string ClientIP { get; }
         public string Time { get; }
         public string Content { get; }
     }
@@ -27,14 +33,16 @@ namespace CRMC.Server
 
         public Config Config => Config.Instance;
         public ObservableCollection<LogInfo> Logs { get; } = new ObservableCollection<LogInfo>();
+        public static MainWindow Instance { get; private set; }
         public MainWindow()
         {
+            Instance = this;
             InitializeComponent();
         }
-        private  void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             Config.Save();
-   
+
             grdControl.IsEnabled = false;
             btnStart.Content = "正在启动服务";
             try
@@ -80,11 +88,30 @@ namespace CRMC.Server
 
 
 
-        public void AddLog(string content,string ip)
+        public static void AddLog(string content, ClientInfo client)
         {
-            LogInfo log = new LogInfo(content,ip);
-            Logs.Add(log);
-            lvwLog.ScrollIntoView(log);
+            Instance.Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    string ip = null;
+                    try
+                    {
+                        ip = (client?.Telnet.ClientSocket.RemoteEndPoint as IPEndPoint)?.Address?.ToString();
+                    }
+                    catch
+                    {
+
+                    }
+                    LogInfo log = new LogInfo(content, ip, client?.Name, client?.ID);
+                    Instance.Logs.Add(log);
+                    Instance.lvwLog.ScrollIntoView(log);
+                }
+                catch
+                {
+
+                }
+            });
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -94,10 +121,10 @@ namespace CRMC.Server
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            #if DEBUG
+#if DEBUG
             Button_Click(null, null);
             WindowState = WindowState.Minimized;
-            #endif
+#endif
         }
     }
 }

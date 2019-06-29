@@ -9,16 +9,23 @@
        xmlns:win10="clr-namespace:FzLib.Control.Win10Style;assembly=FzWpfControlLib"
       xmlns:flat="clr-namespace:FzLib.Control.FlatStyle;assembly=FzWpfControlLib"
         mc:Ignorable="d"
+    Title="文件管理——计算机远程监控系统（客户端）"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Loaded="Window_Loaded">
     <Window.Resources>
         <local:FileFolderIconConverter x:Key="iconConverter"/>
         <ContextMenu x:Key="menuOverItem">
             <MenuItem Header="下载" Click="DownloadMenuClick"/>
+            <MenuItem Header="复制" Click="CopyButtonClick"/>
+            <MenuItem Header="剪切" Click="CutButtonClick"/>
+            <MenuItem Header="删除" Click="DeleteButtonClick"/>
         </ContextMenu>    
         <ContextMenu x:Key="menuEmpty">
             <MenuItem Header="粘贴" Click="PasteMenuClick"/>
+            <MenuItem Header="上传" Click="UploadMenuClick"/>
         </ContextMenu>
+        
+        
         
     </Window.Resources>
     <Grid>
@@ -43,10 +50,12 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="8"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <flat:Button Click="JumpToUpButtonClick" Content="上一级"/>
-                <flat:UneditableComboBox Grid.Column="2" Width="48" ItemsSource="{Binding Drives}" SelectedItem="{Binding SelectedDrive}"/>
-                <TextBox Grid.Column="4" x:Name="txtPath" VerticalAlignment="Center">
+                <flat:Button Click="JumpToUpButtonClick" Content="↑" FontWeight="Bold" FontSize="20"/>
+                <flat:UneditableComboBox Grid.Column="2" Width="48" FontSize="16" ItemsSource="{Binding Drives}" VerticalContentAlignment="Center" SelectedItem="{Binding SelectedDrive}"/>
+                <TextBox Grid.Column="4" x:Name="txtPath" FontSize="16" VerticalContentAlignment="Center">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type TextBox}">
                             <Style.Triggers>
@@ -59,7 +68,8 @@
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-                <flat:Button Grid.Column="6" Click="JumpToFolderButtonClick" Content="转到"/>
+                <flat:Button Grid.Column="8" Click="JumpToFolderButtonClick" Content="➤" FontSize="20"/>
+                <flat:Button Grid.Column="6" Click="RefreshButtonClick" Content="↺" FontSize="20"/>
             </Grid>
 
             <flat:ListView x:Name="lvw"  
